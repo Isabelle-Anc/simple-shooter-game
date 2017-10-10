@@ -52,17 +52,20 @@ class Bullet:
         self.y += self.speed
         global game_objects
         counter = 0
+#         self_cors = canvas.bbox(self, *need tag for this bullet*)
+        self_cors = canvas.bbox(self, "bullet")
+#         canvas.gettags(self, "bullet")
         for game_object in game_objects:
             if "Enemy" in str(game_object):
-                enemy_cors = (canvas.bbox(self, id_tags[counter]))
-#                 if abs(Enemy.x - self.x) <= 20 and abs(Enemy.y - self.y) <= 20:
+                enemy_cors = canvas.bbox(self, id_tags[counter])
+#                 print (str(self_cors)) + (",") + (str(enemy_cors))
+#                 if enemy_cors - self.x) <= 20 and abs(Enemy.y - self.y) <= 20:
 #                     print(Enemy.y)
 #                     print(self.y)
                 counter += 1
-            print type(canvas.bbox(Tkinter.ALL))
     
     def draw(self, canvas):
-        canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3, fill="white", outline="")
+        canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3, fill="white", outline="", tags="bullet")
 
 def create_player():
     global game_objects
@@ -75,6 +78,8 @@ def create_enemy(x, y, id):
 def create_bullet(x, y):
     global game_objects
     game_objects.append(Bullet(x, y))
+    print len(game_objects)
+    print 
 
 
 def draw(canvas):
@@ -86,17 +91,21 @@ def draw(canvas):
     for game_object in game_objects:
         game_object.update()
         game_object.draw(canvas)
+    
+    canvas.addtag_enclosed("delete", 0, 0, -400, -100)
 
     delay = 33 # milliseconds, so about 30 frames per second
     canvas.after(delay, draw, canvas) # call this draw function with the canvas argument again after the delay
 
 def move_left(event):
     global xPos
-    xPos -= 20
+    if xPos > 20:
+        xPos -= 20
 
 def move_right(event):
     global xPos
-    xPos += 20
+    if xPos < 380:
+        xPos += 20
 
 def player_shoot(event):
     global xPos
