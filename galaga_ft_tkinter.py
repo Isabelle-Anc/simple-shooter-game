@@ -52,16 +52,12 @@ class Bullet:
         self.y += self.speed
         global game_objects
         counter = 0
-#         self_cors = canvas.bbox(self, *need tag for this bullet*)
-        self_cors = canvas.bbox(self, "bullet")
-#         canvas.gettags(self, "bullet")
         for game_object in game_objects:
-            if "Enemy" in str(game_object):
+            if "Enemy" in str(game_object) and "None" not in str(canvas.bbox(self, id_tags[counter])):
                 enemy_cors = canvas.bbox(self, id_tags[counter])
-#                 print (str(self_cors)) + (",") + (str(enemy_cors))
-#                 if enemy_cors - self.x) <= 20 and abs(Enemy.y - self.y) <= 20:
-#                     print(Enemy.y)
-#                     print(self.y)
+                if math.sqrt((self.x-(enemy_cors[0]+10))**2 + (self.y-(enemy_cors[1]+10))**2) <= 20:
+                    print "Enemy", id_tags[counter], "was hit"
+                    canvas.dtag(id_tags[counter])
                 counter += 1
     
     def draw(self, canvas):
@@ -78,13 +74,9 @@ def create_enemy(x, y, id):
 def create_bullet(x, y):
     global game_objects
     game_objects.append(Bullet(x, y))
-    print len(game_objects)
-    print 
-
 
 def draw(canvas):
-    # Clear the canvas, have all game objects update and redraw, then set up the next draw.
-
+    # draw loop
     canvas.delete(Tkinter.ALL)
 
     global game_objects
@@ -94,7 +86,7 @@ def draw(canvas):
     
     canvas.addtag_enclosed("delete", 0, 0, -400, -100)
 
-    delay = 33 # milliseconds, so about 30 frames per second
+    delay = 33
     canvas.after(delay, draw, canvas) # call this draw function with the canvas argument again after the delay
 
 def move_left(event):
@@ -128,13 +120,13 @@ for i in range(5):
     create_enemy(pos, 150, id_tags[i+9])
     pos += 75
 
-
 if __name__ == '__main__':
 
     # create the graphics root and a 400x400 canvas
     root = Tkinter.Tk()
     canvas = Tkinter.Canvas(root, width=400, height=400, background="black")
     canvas.pack()
+    print str(type(canvas.bbox("fake_tag_heh")))
 
     root.bind('<Key-a>', move_left)
     root.bind('<Key-d>', move_right)
