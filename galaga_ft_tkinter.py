@@ -4,6 +4,7 @@ import time
 import math
 
 game_objects = []
+dead_list = []
 id_tags = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n"]
 xPos = 200
 
@@ -51,13 +52,19 @@ class Bullet:
     def update(self):
         self.y += self.speed
         global game_objects
+        global id_tags
+        global dead_list
         counter = 0
         for game_object in game_objects:
-            if "Enemy" in str(game_object) and "None" not in str(canvas.bbox(self, id_tags[counter])):
-                enemy_cors = canvas.bbox(self, id_tags[counter])
-                if math.sqrt((self.x-(enemy_cors[0]+10))**2 + (self.y-(enemy_cors[1]+10))**2) <= 20:
-                    print "Enemy", id_tags[counter], "was hit"
-                    canvas.dtag(id_tags[counter])
+            if "Enemy" in str(game_object):
+                if str(canvas.bbox(self, id_tags[counter])) != "None":
+                    enemy_cors = canvas.bbox(self, id_tags[counter])
+                    if math.sqrt((self.x-(enemy_cors[0]+10))**2 + (self.y-(enemy_cors[1]+10))**2) <= 20:
+                        print "Enemy", id_tags[counter], "was hit"
+                        dead_list.append(id_tags[counter])
+                        for i in dead_list:
+                            if i in id_tags:
+                                id_tags.remove(i)
                 counter += 1
     
     def draw(self, canvas):
@@ -122,11 +129,9 @@ for i in range(5):
 
 if __name__ == '__main__':
 
-    # create the graphics root and a 400x400 canvas
     root = Tkinter.Tk()
     canvas = Tkinter.Canvas(root, width=400, height=400, background="black")
     canvas.pack()
-    print str(type(canvas.bbox("fake_tag_heh")))
 
     root.bind('<Key-a>', move_left)
     root.bind('<Key-d>', move_right)
