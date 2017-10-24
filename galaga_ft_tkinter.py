@@ -1,7 +1,6 @@
-import Tkinter
-import random
-import time
-import math
+import Tkinter # Python graphics library
+import random # for random events like if an enemy should shoot (which I am yet to implement)
+import math # for square roots, used in collision detection
 
 game_objects = []
 dead_list = []
@@ -62,10 +61,10 @@ class Bullet:
                     if math.sqrt((self.x-(enemy_cors[0]+10))**2 + (self.y-(enemy_cors[1]+10))**2) <= 20:
                         print "Enemy", id_tags[counter], "was hit"
                         dead_list.append(id_tags[counter])
-                        for i in dead_list:
-                            if i in id_tags:
-                                id_tags.remove(i)
                 counter += 1
+#         for i in dead_list:
+#             if i in id_tags:
+#                 id_tags.remove(i)
     
     def draw(self, canvas):
         canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3, fill="white", outline="", tags="bullet")
