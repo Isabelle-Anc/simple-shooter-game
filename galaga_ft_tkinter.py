@@ -1,10 +1,9 @@
 import Tkinter # Python graphics library
-import random # for random events like if an enemy should shoot (which I am yet to implement)
+import random # for random events that I am yet to implement
 import math # for square roots, used in collision detection
+import string # for the alphabet string used for enemy id
 
 game_objects = []
-dead_list = []
-id_tags = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n"]
 xPos = 200
 
 class Player:
@@ -35,8 +34,14 @@ class Enemy:
         if self.counter == 24:
             self.counter = 0
             self.speed = self.speed * -1
-        return self.x
-        return self.y
+    def check_collision(self):
+        for game_object in game_objects:
+            if game_object.__class__.__name__ == "Bullet":
+                if canvas.bbox(self, string.ascii_lowercase[counter]) != None:
+                    enemy_cors = canvas.bbox(self, string.ascii_lowercase[counter])
+                    if math.sqrt((self.x-(enemy_cors[0]+10))**2 + (self.y-(enemy_cors[1]+10))**2) <= 20:
+                        print("Enemy"), (self.id), ("was hit")
+
     
     def draw(self, canvas):
         canvas.create_oval(self.x-10, self.y-10, self.x+10, self.y+10, fill="green", outline="", tags=self.id)
@@ -53,18 +58,6 @@ class Bullet:
         global game_objects
         global id_tags
         global dead_list
-        counter = 0
-        for game_object in game_objects:
-            if "Enemy" in str(game_object):
-                if str(canvas.bbox(self, id_tags[counter])) != "None":
-                    enemy_cors = canvas.bbox(self, id_tags[counter])
-                    if math.sqrt((self.x-(enemy_cors[0]+10))**2 + (self.y-(enemy_cors[1]+10))**2) <= 20:
-                        print "Enemy", id_tags[counter], "was hit"
-                        dead_list.append(id_tags[counter])
-                counter += 1
-#         for i in dead_list:
-#             if i in id_tags:
-#                 id_tags.remove(i)
     
     def draw(self, canvas):
         canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3, fill="white", outline="", tags="bullet")
@@ -109,23 +102,6 @@ def player_shoot(event):
     global xPos
     create_bullet(xPos, 350)
 
-create_player()
-
-pos = 37.5
-for i in range(5):
-    create_enemy(pos, 50, id_tags[i])
-    pos += 75
-
-pos = 75
-for i in range(4):
-    create_enemy(pos, 100, id_tags[i+5])
-    pos += 75
-
-pos = 37.5
-for i in range(5):
-    create_enemy(pos, 150, id_tags[i+9])
-    pos += 75
-
 if __name__ == '__main__':
 
     root = Tkinter.Tk()
@@ -136,7 +112,27 @@ if __name__ == '__main__':
     root.bind('<Key-d>', move_right)
     root.bind('<Key-s>', player_shoot)
     
+    create_player()
+    
+    # creates the arrangement of enemies
+    pos = 37.5
+    for i in range(5):
+        create_enemy(pos, 50, string.ascii_lowercase[i])
+        pos += 75
+
+    pos = 75
+    for i in range(4):
+        create_enemy(pos, 100, string.ascii_lowercase[i+5])
+        pos += 75
+
+    pos = 37.5
+    for i in range(5):
+        create_enemy(pos, 150, string.ascii_lowercase[i+9])
+        pos += 75
+    
     # start the draw loop
     draw(canvas)
     
     root.mainloop() # keep the window open
+''' Ideally, this is how the collision detection code would work:
+    Every enemy would take its coordinates and put them in a place accessible to the bullet. Each bullet would then compare the coordinates to the enemy's using pythag and fun things like that.'''
