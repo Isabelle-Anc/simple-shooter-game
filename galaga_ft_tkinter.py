@@ -39,11 +39,11 @@ class Enemy:
     def check_collision(self):
         for game_object in game_objects:
             if game_object.__class__.__name__ == "Bullet":
-                self.bullet_bbox = game_object.get_bbox()
-                if math.sqrt((self.x-(self.bullet_bbox[0]+10))**2 +
-                (self.y-(self.bullet_bbox[1]+10))**2) <= 20:
-                    print("Enemy"), (self.id), ("was hit")
-                self.counter += 1
+                self.bullet_cors = game_object.get_cors()
+                if math.sqrt((self.x-(self.bullet_cors[0]))**2 +
+                (self.y-(self.bullet_cors[1]+10))**2) <= 20:
+                    self.x = 420
+                    self.y = 420
     
     def draw(self, canvas):
         canvas.create_oval(self.x-10, self.y-10, self.x+10, self.y+10,
@@ -55,19 +55,16 @@ class Bullet:
         self.y = y
         
         self.speed = -5
-        self.bbox = None
-        self.id = None
     
     def update(self):
         self.y += self.speed
     
     def draw(self, canvas):
-        self.id = canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3,
+        canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3,
             fill="white", outline="", tags="bullet")
     
-    def get_bbox(self):
-        self.bbox = canvas.bbox(self, self.id)
-        return self.bbox
+    def get_cors(self):
+        return(self.x, self.y)
 
 def create_player():
     global game_objects
