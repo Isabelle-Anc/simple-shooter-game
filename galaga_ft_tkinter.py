@@ -1,7 +1,7 @@
 import Tkinter # Python graphics library
 import random # for random events that I am yet to implement
 import math # for square roots, used in collision detection
-import string # for the alphabet string used for enemy id
+import string # alphabet string is used for creating enemy ids
 
 game_objects = []
 x_pos = 200
@@ -11,9 +11,18 @@ class Player:
         global x_pos
         self.x = x_pos
         self.y = y
+        self.bullet_cors = None
     
     def update(self):
         self.x = x_pos
+        
+        for game_object in game_objects:
+            if game_object.__class__.__name__ == "Enemy_Bullet":
+                self.bullet_cors = game_object.get_cors()
+                if math.sqrt((self.x-(self.bullet_cors[0]))**2 +
+                (self.y-(self.bullet_cors[1]+10))**2) <= 15:
+                    self.x = 420
+                    self.y = 420
     
     def draw(self, canvas):
         canvas.create_polygon(self.x, self.y, self.x-10, self.y+20, self.x+10, self.y+20, fill="red", outline="")
@@ -35,15 +44,19 @@ class Enemy:
         if self.counter == 24:
             self.counter = 0
             self.speed = self.speed * -1
-    
-    def check_collision(self):
+        
+        # collision detection
         for game_object in game_objects:
             if game_object.__class__.__name__ == "Bullet":
                 self.bullet_cors = game_object.get_cors()
                 if math.sqrt((self.x-(self.bullet_cors[0]))**2 +
-                (self.y-(self.bullet_cors[1]+10))**2) <= 20:
+                (self.y-(self.bullet_cors[1]+10))**2) <= 15:
                     self.x = 420
                     self.y = 420
+        
+        # shooting
+        if random.randint(1, 100) == 100 and self.y != 400:
+            game_objects.append(Enemy_Bullet(self.x, self.y))
     
     def draw(self, canvas):
         canvas.create_oval(self.x-10, self.y-10, self.x+10, self.y+10,
@@ -61,10 +74,18 @@ class Bullet:
     
     def draw(self, canvas):
         canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3,
-            fill="white", outline="", tags="bullet")
+            fill="yellow", outline="", tags="bullet")
     
     def get_cors(self):
         return(self.x, self.y)
+
+class Enemy_Bullet(Bullet):
+    def update(self):
+        self.y -= self.speed
+    
+    def draw(self, canvas):
+        canvas.create_rectangle(self.x-3, self.y-3, self.x+3, self.y+3,
+            fill="white", outline="", tags="bullet")
 
 def create_player():
     global game_objects
@@ -86,8 +107,6 @@ def draw(canvas):
     for game_object in game_objects:
         game_object.update()
         game_object.draw(canvas)
-        if game_object.__class__.__name__ == "Enemy":
-            game_object.check_collision()
     
     delay = 33
     canvas.after(delay, draw, canvas) # call this draw function with the canvas argument again after the delay
@@ -138,7 +157,3 @@ if __name__ == '__main__':
     draw(canvas)
     
     root.mainloop() # keep the window open
-''' Ideally, this is how the collision detection code would work:
-    Every enemy would take its coordinates and put them in a place accessible to the 
-    bullet. Each bullet would then compare the coordinates to the enemy's using pythag and 
-    fun things like that.'''
