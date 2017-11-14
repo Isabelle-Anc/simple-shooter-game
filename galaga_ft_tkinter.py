@@ -142,13 +142,13 @@ def move_right(event):
 def player_shoot(event):
     global x_pos
     for game_object in game_objects:
-        if game_object.__class__.__name__ == "Player" and game_object.life_check() ad== True:
+        if game_object.__class__.__name__ == "Player" and game_object.life_check() == True:
             create_bullet(x_pos, 350)
 
 if __name__ == '__main__':
 
     root = Tkinter.Tk()
-    canvas = Tkinter.Canvas(root, width=400, height=400, background="black")
+    canvas = Tkinter.Canvas(root, width=800, height=800, background="black")
     canvas.pack()
     root.attributes("-topmost", True)
     root.bind('<Key-a>', move_left)
