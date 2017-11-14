@@ -2,15 +2,33 @@ import Tkinter # Python graphics library
 import random # for random events that I am yet to implement
 import math # for square roots, used in collision detection
 import string # alphabet string is used for creating enemy ids
+import abc # abstract base class
 
 game_objects = []
 x_pos = 200
 
-class Player:
+class Game_Object:
+    __metaclass__ = abc.ABCMeta
+    
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.is_alive = True
+    
+    def draw(self, canvas):
+        pass
+    
+    def update(self, canvas):
+        pass
+    
+    def life_check(self):
+        return self.is_alive
+    
+class Player(Game_Object):
     def __init__ (self, x, y):
+        Game_Object.__init__(self, x, y)
         global x_pos
         self.x = x_pos
-        self.y = y
         self.bullet_cors = None
     
     def update(self):
@@ -23,19 +41,18 @@ class Player:
                 (self.y-(self.bullet_cors[1]+10))**2) <= 15:
                     self.x = 420
                     self.y = 420
+                    self.is_alive = False
     
     def draw(self, canvas):
         canvas.create_polygon(self.x, self.y, self.x-10, self.y+20, self.x+10, self.y+20, fill="red", outline="")
 
-class Enemy:
+class Enemy(Game_Object):
     def __init__ (self, x, y, id):
-        self.x = x
-        self.y = y
+        Game_Object.__init__(self, x, y)
         self.id = id
         
         self.speed = 1
         self.counter = 0
-        self.bullet_bbox = None
     
     def update(self):
         self.x += self.speed
@@ -53,6 +70,7 @@ class Enemy:
                 (self.y-(self.bullet_cors[1]+10))**2) <= 15:
                     self.x = 420
                     self.y = 420
+                    self.is_alive = False
         
         # shooting
         if random.randint(1, 100) == 100 and self.y != 400:
@@ -62,10 +80,9 @@ class Enemy:
         canvas.create_oval(self.x-10, self.y-10, self.x+10, self.y+10,
             fill="green", outline="", tags=self.id)
 
-class Bullet:
+class Bullet(Game_Object):
     def __init__ (self, x, y):
-        self.x = x
-        self.y = y
+        Game_Object.__init__(self, x, y)
         
         self.speed = -5
     
@@ -105,8 +122,9 @@ def draw(canvas):
 
     global game_objects
     for game_object in game_objects:
-        game_object.update()
-        game_object.draw(canvas)
+        if game_object.life_check() == True:
+            game_object.update()
+            game_object.draw(canvas)
     
     delay = 33
     canvas.after(delay, draw, canvas) # call this draw function with the canvas argument again after the delay
@@ -123,14 +141,16 @@ def move_right(event):
 
 def player_shoot(event):
     global x_pos
-    create_bullet(x_pos, 350)
+    for game_object in game_objects:
+        if game_object.__class__.__name__ == "Player" and game_object.life_check() ad== True:
+            create_bullet(x_pos, 350)
 
 if __name__ == '__main__':
 
     root = Tkinter.Tk()
     canvas = Tkinter.Canvas(root, width=400, height=400, background="black")
     canvas.pack()
-
+    root.attributes("-topmost", True)
     root.bind('<Key-a>', move_left)
     root.bind('<Key-d>', move_right)
     root.bind('<Key-s>', player_shoot)
