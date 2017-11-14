@@ -148,7 +148,7 @@ def player_shoot(event):
 if __name__ == '__main__':
 
     root = Tkinter.Tk()
-    canvas = Tkinter.Canvas(root, width=800, height=800, background="black")
+    canvas = Tkinter.Canvas(root, width=400, height=400, background="black")
     canvas.pack()
     root.attributes("-topmost", True)
     root.bind('<Key-a>', move_left)
