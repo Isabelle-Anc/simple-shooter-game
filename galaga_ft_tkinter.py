@@ -1,11 +1,22 @@
+# To do list:
+# -Win/lose condition
+# -Lambdas (see comment in 1st project check-in)
+# -Bring window to front and have as active application
+# -Bullets not going through enemies
+# -Enemies being the ones creating the bullets? Seems like a better way to organize
+# -More comments!
+
 import Tkinter # Python graphics library
-import random # for random events that I am yet to implement
+import random # for random events
 import math # for square roots, used in collision detection
 import string # alphabet string is used for creating enemy ids
 import abc # abstract base class
 
+# globals- I need to fix
 game_objects = []
 x_pos = 200
+
+game_state = None
 
 class Game_Object:
     __metaclass__ = abc.ABCMeta
@@ -14,15 +25,32 @@ class Game_Object:
         self.x = x
         self.y = y
         self.is_alive = True
+        self.game_state = True
     
+    @abc.abstractmethod
     def draw(self, canvas):
         pass
     
+    @abc.abstractmethod
     def update(self, canvas):
         pass
     
     def life_check(self):
         return self.is_alive
+    
+    @staticmethod
+    def win_check(self):
+        global game_state
+        for game_object in game_objects:
+            if game_object.__class__.__name__ == "Player" and game_object.life_check() == False:
+                game_state = "Loss"
+            # elif game_object.__class__.__name__ == "Enemy"
+#                 and game_object.life_check() == False:
+#                 game_state = "Win"
+
+            # currently detects if an enemy is dead, need to detect if ALL are
+            # funny, it's easier to implement losing than winning.
+        return game_state
     
 class Player(Game_Object):
     def __init__ (self, x, y):
@@ -145,7 +173,8 @@ def player_shoot(event):
         if game_object.__class__.__name__ == "Player" and game_object.life_check() == True:
             create_bullet(x_pos, 350)
 
-if __name__ == '__main__':
+# this will only run in the original program, not if this file is imported
+if __name__ == '__main__': 
 
     root = Tkinter.Tk()
     canvas = Tkinter.Canvas(root, width=400, height=400, background="black")
@@ -162,18 +191,19 @@ if __name__ == '__main__':
     for i in range(5):
         create_enemy(pos, 50, string.ascii_lowercase[i])
         pos += 75
-
+    
     pos = 75
     for i in range(4):
         create_enemy(pos, 100, string.ascii_lowercase[i+5])
         pos += 75
-
+    
     pos = 37.5
     for i in range(5):
         create_enemy(pos, 150, string.ascii_lowercase[i+9])
         pos += 75
     
+    game_state = "Playing"
     # start the draw loop
     draw(canvas)
-    
+
     root.mainloop() # keep the window open
