@@ -1,10 +1,9 @@
 # To do list: (in no particular order)
-# -Win/lose condition- look into having text appear
 # -Lambdas to remove globals (see comment in 1st project check-in)
 # -Bring window to front and have as active application
 # -Bullets not going through enemies
 # -Enemies being the ones creating the bullets- seems like a better way to organize
-# -Delay before game starts
+# -Click the screen to start
 # -More comments, so people know what I'm doing!
 
 import Tkinter # Python graphics library
@@ -17,7 +16,7 @@ from string import ascii_lowercase # alphabet string is used for creating enemy 
 game_objects = [] # list that holds all of the game objects- used as global
 x_pos = 200 # x position of the player- used as global
 
-game_state = None # keeps track of win conditions
+game_state = "Playing" # keeps track of win conditions
 
 class Game_Object:
     # creates a generic game object
@@ -149,25 +148,31 @@ def create_bullet(x, y):
     game_objects.append(Bullet(x, y))
 
 def draw(canvas): # draw loop
+    DELAY = 33  # The one constant variable in my code!
+                # Unless the canvas count and root count?
     canvas.delete(Tkinter.ALL)
-
+    
     global game_objects
     for game_object in game_objects:
         if game_object.life_check() == True:
             game_object.update()
             game_object.draw(canvas)
+    
+    global game_state
     game_state = Game_Object.win_check()
-    DELAY = 33  # The one constant variable in my code!
-                # Unless the canvas count and root count?
+    
     if game_state == "Playing":
         # call this draw function with the canvas argument again after the delay
         # as long as the game is still going
         canvas.after(DELAY, draw, canvas)
-    elif game_state == "Win":
-        canvas.create_text(200, 200, text="You win!", fill="white")
-    elif game_state == "Lose":
-        canvas.create_text(200, 200, text="u ded", fill="white")
-
+    else:
+        canvas.delete(Tkinter.ALL)
+        if game_state == "Win":
+            canvas.create_text(200, 200, text="u did gud", fill="white",
+                font=("ubuntu", 24))
+        elif game_state == "Loss":
+            canvas.create_text(200, 200, text="u ded", fill="white",
+                font=("ubuntu", 24))
 
 def move_left(event):
     global x_pos
@@ -186,6 +191,12 @@ def player_shoot(event):
             game_object.life_check() == True):
             create_bullet(x_pos, 350)
 
+def start_game(event):
+    global game_state
+    if game_state == None:
+        game_state = "Playing"
+        print("Started")
+
 # this will only run in the original program, not if this file is imported for classes
 if __name__ == '__main__': 
 
@@ -196,6 +207,7 @@ if __name__ == '__main__':
     root.bind('<Key-a>', move_left)
     root.bind('<Key-d>', move_right)
     root.bind('<Key-s>', player_shoot)
+    root.bind('<Button-1>', start_game)
     
     create_player()
     
@@ -215,8 +227,10 @@ if __name__ == '__main__':
         create_enemy(pos, 150, ascii_lowercase[i+9])
         pos += 75
     
-    game_state = "Playing"
-    
+#     game_state = "Waiting"
+#     while True:
+#         if game_state == "Playing":
+#             break
     # start the draw loop
     draw(canvas)
 
