@@ -1,9 +1,8 @@
 # To do list: (in no particular order)
 # -Lambdas to remove globals (see comment in 1st project check-in)
-# -Bring window to front and have as active application
+# -Have as active application when the program starts
 # -Bullets not going through enemies
 # -Enemies being the ones creating the bullets- seems like a better way to organize
-# -Click the screen to start
 # -More comments, so people know what I'm doing!
 
 import Tkinter # Python graphics library
@@ -11,7 +10,9 @@ import random # for random events
 import math # for square roots, used in collision detection
 import abc # abstract base class
 
+# I just need one element from each of these libraries
 from string import ascii_lowercase # alphabet string is used for creating enemy ids
+from time import sleep # to incorporate delays
 
 game_objects = [] # list that holds all of the game objects- used as global
 x_pos = 200 # x position of the player- used as global
@@ -193,9 +194,14 @@ def player_shoot(event):
 
 def start_game(event):
     global game_state
-    if game_state == None:
+    if game_state == "Waiting":
         game_state = "Playing"
-        print("Started")
+        for text_item in ["a and d keys to move", "press s to shoot", "3", "2", "1"]:
+            canvas.delete(Tkinter.ALL)
+            canvas.create_text(200, 200, text=text_item, fill="white",
+                font=("ubuntu", 24))
+            sleep(1)
+        draw(canvas)
 
 # this will only run in the original program, not if this file is imported for classes
 if __name__ == '__main__': 
@@ -227,11 +233,8 @@ if __name__ == '__main__':
         create_enemy(pos, 150, ascii_lowercase[i+9])
         pos += 75
     
-#     game_state = "Waiting"
-#     while True:
-#         if game_state == "Playing":
-#             break
-    # start the draw loop
-    draw(canvas)
+    game_state = "Waiting"
+    canvas.create_text(200, 200, text="click to begin", fill="white",
+                font=("ubuntu", 24))
 
     root.mainloop() # keep the window open
