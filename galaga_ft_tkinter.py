@@ -1,6 +1,5 @@
 # To do list: (in no particular order)
 # -Lambdas to remove globals (see comment in 1st project check-in)
-# -Bullets not going through enemies
 # -Enemies being the ones creating the bullets- seems like a better way to organize
 # -More comments, so people know what I'm doing!
 # -Bullets destroying enemy bullets
@@ -40,6 +39,11 @@ class Game_Object:
     def life_check(self):
         return self.is_alive
     
+    def delete(self):
+        self.x = 420
+        self.y = 420
+        self.is_alive = False
+    
     @staticmethod
     def win_check():
         # checks if the player has won or lost the game
@@ -72,9 +76,7 @@ class Player(Game_Object):
                 self.bullet_cors = game_object.get_cors()
                 if math.sqrt((self.x-(self.bullet_cors[0]))**2 +
                     (self.y-(self.bullet_cors[1]+10))**2) <= 15:
-                    self.x = 420
-                    self.y = 420
-                    self.is_alive = False
+                    self.delete()
     
     def draw(self, canvas):
         canvas.create_polygon(self.x, self.y, self.x-10, self.y+20, self.x+10, self.y+20, 
@@ -102,9 +104,8 @@ class Enemy(Game_Object):
                 self.bullet_cors = game_object.get_cors()
                 if math.sqrt((self.x-(self.bullet_cors[0]))**2 +
                     (self.y-(self.bullet_cors[1]+10))**2) <= 15:
-                    self.x = 420
-                    self.y = 420
-                    self.is_alive = False
+                    self.delete()
+                    game_object.delete()
         
         # each frame the enemy has a 1% chance of shooting a bullet
         if random.randint(1, 100) == 100 and self.y != 400:
@@ -122,6 +123,14 @@ class Bullet(Game_Object):
     
     def update(self):
         self.y += self.speed
+        
+        for game_object in game_objects:
+            if game_object.__class__.__name__ == "Enemy_Bullet":
+                self.bullet_cors = game_object.get_cors()
+                if math.sqrt((self.x-(self.bullet_cors[0]))**2 +
+                    (self.y-(self.bullet_cors[1]+10))**2) <= 6:
+                    self.delete()
+                    game_object.delete()
     
     def draw(self, canvas):
         canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3,
