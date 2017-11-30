@@ -1,9 +1,9 @@
 # To do list: (in no particular order)
 # -Lambdas to remove globals (see comment in 1st project check-in)
-# -Have as active application when the program starts
 # -Bullets not going through enemies
 # -Enemies being the ones creating the bullets- seems like a better way to organize
 # -More comments, so people know what I'm doing!
+# -Bullets destroying enemy bullets
 
 import Tkinter # Python graphics library
 import random # for random events
@@ -42,6 +42,7 @@ class Game_Object:
     
     @staticmethod
     def win_check():
+        # checks if the player has won or lost the game
         global game_state
         alive_counter = 0
         for game_object in game_objects:
@@ -65,6 +66,7 @@ class Player(Game_Object):
     def update(self):
         self.x = x_pos
         
+        # checks for collisions
         for game_object in game_objects:
             if game_object.__class__.__name__ == "Enemy_Bullet":
                 self.bullet_cors = game_object.get_cors()
@@ -149,8 +151,8 @@ def create_bullet(x, y):
     game_objects.append(Bullet(x, y))
 
 def draw(canvas): # draw loop
-    DELAY = 33  # The one constant variable in my code!
-                # Unless the canvas count and root count?
+    global game_state
+    DELAY = 33
     canvas.delete(Tkinter.ALL)
     
     global game_objects
@@ -159,7 +161,6 @@ def draw(canvas): # draw loop
             game_object.update()
             game_object.draw(canvas)
     
-    global game_state
     game_state = Game_Object.win_check()
     
     if game_state == "Playing":
@@ -195,13 +196,20 @@ def player_shoot(event):
 def start_game(event):
     global game_state
     if game_state == "Waiting":
-        game_state = "Playing"
-        for text_item in ["a and d keys to move", "press s to shoot", "3", "2", "1"]:
+        game_state = "Writing"
+        
+        TEXT_ITEMS = ["a and d keys to move", "press s to shoot", "3", "2", "1", "final buffer item"]
+    
+        def write_on_canvas(item_number):
             canvas.delete(Tkinter.ALL)
-            canvas.create_text(200, 200, text=text_item, fill="white",
-                font=("ubuntu", 24))
-            sleep(1)
-        draw(canvas)
+            canvas.create_text(200, 200, text=TEXT_ITEMS[item_number], fill="white", font=("ubuntu", 24))
+            if item_number < (len(TEXT_ITEMS)-1):
+                canvas.after(1000, write_on_canvas, item_number+1)
+            else:
+                global game_state
+                game_state = "Playing"
+                draw(canvas)
+        write_on_canvas(0)
 
 # this will only run in the original program, not if this file is imported for classes
 if __name__ == '__main__': 
