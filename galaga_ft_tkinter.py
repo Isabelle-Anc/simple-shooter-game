@@ -1,19 +1,14 @@
-# To do list: (in no particular order)
-# -Lambdas to remove globals (see comment in 1st project check-in)
-# -More comments, so people know what I'm doing!
+# Yay it's Galaga
+# It's pretty much done for now
 
 import Tkinter # Python graphics library
 import random # for random events
 import math # for square roots, used in collision detection
 import abc # abstract base class
 
-# I just need one element from each of these libraries
-from string import ascii_lowercase # alphabet string is used for creating enemy ids
-from time import sleep # to incorporate delays
-
-game_objects = [] # list that holds all of the game objects- used as global
-x_pos = 200 # x position of the player- used as global
-
+# next three variables are used as globals for now
+game_objects = [] # list that holds all of the game objects
+x_pos = 200 # x position of the player
 game_state = "Playing" # keeps track of win conditions
 
 class Game_Object:
@@ -179,10 +174,10 @@ def draw(canvas): # draw loop
             canvas.create_text(200, 200, text="u ded", fill="white",
                 font=("ubuntu", 24))
 
-def move_left(event):
-    global x_pos
+def move_left(x_pos):
     if x_pos > 20:
         x_pos -= 10
+    return x_pos
 
 def move_right(event):
     global x_pos
@@ -217,7 +212,9 @@ def start_game(event):
                 draw(canvas)
         write_on_canvas(0)
 
-# this will only run in the original program, not if this file is imported for classes
+# this will only run in the original program, not if this file is imported into
+# another program
+
 if __name__ == '__main__': 
 
     root = Tkinter.Tk()
