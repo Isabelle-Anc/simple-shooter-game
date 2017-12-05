@@ -38,7 +38,7 @@ class Game_Object:
     
     def delete(self):
         # technically doesn't delete to avoid indexing errors (all of the objects are in a
-        # list; it just moves the object offscreen
+        # list); it just moves the object offscreen
         self.x = 420
         self.y = 420
         self.is_alive = False
@@ -174,10 +174,10 @@ def draw(canvas): # draw loop
             canvas.create_text(200, 200, text="u ded", fill="white",
                 font=("ubuntu", 24))
 
-def move_left(x_pos):
+def move_left(event):
+    global x_pos
     if x_pos > 20:
         x_pos -= 10
-    return x_pos
 
 def move_right(event):
     global x_pos
