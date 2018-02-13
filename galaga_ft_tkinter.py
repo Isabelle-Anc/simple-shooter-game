@@ -19,7 +19,6 @@ class Game_Object:
         self.x = x
         self.y = y
         self.is_alive = True
-        self.game_state = True
     
     # these next two methods are run every frame
     @abc.abstractmethod
@@ -29,7 +28,7 @@ class Game_Object:
     
     @abc.abstractmethod
     def update(self, canvas):
-        # does anything
+        # does anything related to the object's motion
         pass
     
     def life_check(self):
@@ -43,6 +42,9 @@ class Game_Object:
         self.y = 420
         self.is_alive = False
     
+    def get_cors(self):
+        return(self.x, self.y)
+    
     def check_collision(self, object_type, target_number):
         # checks if the object has collided with another
         for game_object in game_objects:
@@ -50,7 +52,7 @@ class Game_Object:
                 self.object_cors = game_object.get_cors()
                 if math.sqrt((self.x-(self.object_cors[0]))**2 +
                     (self.y-(self.object_cors[1]+10))**2) <= target_number:
-                    # deletes both objects that have collided
+                    # "deletes" (moves offscreen) both objects that have collided
                     self.delete()
                     game_object.delete()
     
@@ -83,6 +85,9 @@ class Player(Game_Object):
         self.x = x_pos
         self.check_collision("Enemy_Bullet", 12)
     
+    def shoot(self):
+        create_bullet(self.x, 350)
+    
     def draw(self, canvas):
         canvas.create_polygon(self.x, self.y-10, self.x-10, self.y+10,
             self.x+10, self.y+10, fill="red", outline="")
@@ -114,7 +119,6 @@ class Enemy(Game_Object):
 class Bullet(Game_Object):
     def __init__ (self, x, y):
         Game_Object.__init__(self, x, y)
-        
         self.speed = -3
     
     def update(self):
@@ -124,9 +128,6 @@ class Bullet(Game_Object):
     def draw(self, canvas):
         canvas.create_oval(self.x-3, self.y-3, self.x+3, self.y+3,
             fill="yellow", outline="")
-    
-    def get_cors(self):
-        return(self.x, self.y)
 
 class Enemy_Bullet(Bullet):
     def update(self):
@@ -176,20 +177,19 @@ def draw(canvas): # draw loop
 
 def move_left(event):
     global x_pos
-    if x_pos > 20:
+    if x_pos > 20 and game_state == "Playing":
         x_pos -= 10
 
 def move_right(event):
     global x_pos
-    if x_pos < 380:
+    if x_pos < 380 and game_state == "Playing":
         x_pos += 10
 
 def player_shoot(event):
-    global x_pos
     for game_object in game_objects:
         if (game_object.__class__.__name__ == "Player" and
             game_object.life_check() == True):
-            create_bullet(x_pos, 350)
+            game_object.shoot()
 
 def start_game(event):
     # runs once the player starts the game
@@ -214,7 +214,6 @@ def start_game(event):
 
 # this will only run in the original program, not if this file is imported into
 # another program
-
 if __name__ == '__main__': 
 
     root = Tkinter.Tk()
